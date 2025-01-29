@@ -55,12 +55,13 @@ function AuthPage({ register }) {
 
             if (response.status === 200 || response.status === 201) {
                 if (!register) {
-                    const { access_token, refresh_token, user } = response.data;
+                    const { access_token, refresh_token, user,owner } = response.data;
 
                     // Store tokens and user info in localStorage
                     localStorage.setItem("accessToken", access_token);
                     localStorage.setItem("refreshToken", refresh_token);
                     localStorage.setItem("user", JSON.stringify(user));
+                    localStorage.setItem("owner",owner)
 
                     toast.success("Login successful!");
                     navigate("/dashboard"); // Redirect to dashboard after login

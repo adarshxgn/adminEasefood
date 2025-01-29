@@ -34,6 +34,15 @@ export const getFoodListApi = async (getDish,reqHeader) => {
   
 }
 
+// get all oders api
+export const getAllOdersAPI = async (getOder,reqHeader) =>{
+  return await commonApi("GET", `${BASE_URL}/api/cart,`, getOder , reqHeader)
+}
+//API For Add Food
+export const editFoodListApi = async (editDish,reqHeader) => {
+  return await commonApi("PUT", `${BASE_URL}/api/food/`, editDish, reqHeader)
+  
+}
 
 
 

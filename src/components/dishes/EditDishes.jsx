@@ -1,48 +1,47 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { addFoodListApi } from "../../services/allApi";
-import { addResponceContext } from "../../pages/context/ContextShare";
-import { useContext } from "react";
-
-const AddDishes = ({ onClose }) => {
+import { addFoodListApi, editFoodListApi } from "../../services/allApi";
+import { editResponceContext } from "../../pages/context/ContextShare";
+import { useContext } from "react"; 
+const EditDishes = ({ onClose, dish }) => {
     const[imageFileStatus,setImageFileStatus] = useState(false)
     const [preview,setPreview] = useState('')
-    const{addResponce, setAddResponce} =useContext(addResponceContext)
+    const{editResponce, setEditResponce} =useContext(editResponceContext)
     const [formData, setFormData] = useState({
-        food_name: "",
-        description:"",
-        food_category_obj: "",
-        price: "",
-        food_image:"",
-        time_taken:"",
-        is_available: Boolean,
+        food_name: dish?.food_name,
+        description:dish?.description,
+        food_category_obj:dish?.food_category_obj,
+        price: dish?.price,
+        food_image:dish?.food_image ,
+        time_taken:dish?.time_taken ,
+        is_available: true,
     });
     useEffect(()=>{
-        if(formData.food_image.type=="image/png" || formData.food_image.type=="image/jpg" || formData.food_image.type=="image/jpeg" ){
-          setImageFileStatus(true)
-          setPreview(URL.createObjectURL(formData.food_image))
-        }else{
-          setImageFileStatus(false)
-          setPreview('')
-          setFormData({...formData,food_image:""})
-        }
-      },[formData.food_image])
+            if(formData.food_image.type=="image/png" || formData.food_image.type=="image/jpg" || formData.food_image.type=="image/jpeg" ){
+              setImageFileStatus(true)
+              setPreview(URL.createObjectURL(formData.food_image))
+            }else{
+              setImageFileStatus(false)
+              setPreview('')
+              setFormData({...formData,food_image:""})
+            }
+          },[formData.food_image])
 
  const owner = localStorage.getItem("owner")
     const handleSubmit = async (e) => {
         e.preventDefault();
         const{food_name,description,food_category_obj,price,food_image,time_taken,is_available}=formData
         if(food_name && description && food_category_obj && price && food_image && time_taken && is_available&&owner){
-            const addDish = new FormData()
-            addDish.append('food_name',food_name)
-            addDish.append('description',description)
-            addDish.append('food_category_obj',food_category_obj)
-            addDish.append('price',price)
-            addDish.append('food_image',food_image)
-            addDish.append('time_taken',time_taken)
-            addDish.append('is_available',is_available)
-            addDish.append('owner',owner)
-
+            const editDish = new FormData()
+            editDish.append('food_name',food_name)
+            editDish.append('description',description)
+            editDish.append('food_category_obj',food_category_obj)
+            editDish.append('price',price)
+            editDish.append('food_image',food_image)
+            editDish.append('time_taken',time_taken)
+            editDish.append('is_available',is_available)
+            editDish.append('owner',owner)
+            
             const token = localStorage.getItem("accessToken")   
             if(token){
                 const reqHeader = {
@@ -50,13 +49,13 @@ const AddDishes = ({ onClose }) => {
                   "Authorization":`Bearer ${token}`
                 }
                 try{
-                    const result = await addFoodListApi(addDish,reqHeader)
+                    const result = await editFoodListApi(editDish,reqHeader)
                     console.log(result);
                     if(result.status==200){
                         onclose()
-                        setAddResponce(result)
+                        setEditResponce(result)
                     }else{
-                        console.log(result.response.data)
+                        alert(result.response.data)
                     }
                     
                 }catch(err){
@@ -69,13 +68,6 @@ const AddDishes = ({ onClose }) => {
         onClose(); // Close the modal after submission
     };
 
-
-
-
-    // xcvghjkl;
-    const handleCheckBox = (e)=>{
-       
-    }
     return (
         <motion.div
             className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center h-[30rem]"
@@ -130,9 +122,9 @@ const AddDishes = ({ onClose }) => {
                             Category
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             name="category"
-                            value={formData.category}
+                            value={formData.food_category_obj}
                             onChange={e=>setFormData({...formData,food_category_obj:e.target.value})}
                             className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                             required
@@ -162,7 +154,6 @@ const AddDishes = ({ onClose }) => {
                             className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
                             required
                         />
-                        <img src={preview} alt="" />
                     </div>
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700">
@@ -184,8 +175,8 @@ const AddDishes = ({ onClose }) => {
                         <input
                             type="checkbox"
                             name="is_available"
-                            value={5}
-                            onChange={ e=>setFormData({...formData,is_available:e.target.value})}
+                            checked={formData.is_available}
+                            onChange={e=>setFormData({...formData,is_available:e.target.checked})}
                             className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 text-gray-900"
                         />
                     </div>
@@ -210,4 +201,4 @@ const AddDishes = ({ onClose }) => {
     );
 };
 
-export default AddDishes;
+export default EditDishes;

@@ -6,6 +6,7 @@ import AuthPage from "./pages/auth/AuthPage";
 import Sidebar from "./components/common/Sidebar";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import DishesPage from "./pages/dishespage/DishesPage";
+import OdersPage from "./pages/oderpage/OdersPage";
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
                   <Routes>
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/dishes" element={<DishesPage/>} />
+                    <Route path="/orders" element={<OdersPage/>} />
                   </Routes>
               </div>
             </ProtectedRoutes>

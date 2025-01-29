@@ -10,7 +10,7 @@ const ProtectedRoutes = ({ children }) => {
   const checkTokenExpiry = (token) => {
     try {
       const decodedToken = jwtDecode(token);
-      const currentTime = Date.now() / 1000; // Current time in seconds
+      const currentTime = Date.now() / Infinity; // Current time in seconds
       return decodedToken.exp < currentTime; // Token expired if current time > exp
     } catch (error) {
       console.error("Invalid token", error);

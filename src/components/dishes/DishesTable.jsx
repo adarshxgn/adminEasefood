@@ -1,30 +1,39 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import AddDishes from "./AddDishes";
 import { getFoodListApi } from "../../services/allApi";
 import { BASE_URL } from "../../services/baseUrl";
+import { addResponceContext } from "../../pages/context/ContextShare";
+import EditDishes from "./EditDishes";
 
 const DishesTable = () => {
+    const { addResponce, setAddResponce } = useContext(addResponceContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dishes, setDishes] = useState([]); // State to hold the list of dishes
     const [searchTerm, setSearchTerm] = useState(""); // State for search input
+    const [selectedDish, setSelectedDish] = useState(null); // Track the selected dish for editing
+    
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedDish(null); // Reset the selected dish when closing the modal
+    };
 
     useEffect(() => {
         // Fetch food list from API on component mount
         const fetchFoodList = async () => {
             try {
                 const response = await getFoodListApi();
-                setDishes(response.data); // Assuming the API response contains the food list in response.data
+                setDishes(response.data);
+                console.log(response.data);
             } catch (error) {
                 console.error("Error fetching food list:", error);
             }
         };
 
         fetchFoodList();
-    }, []); // Empty dependency array ensures this effect runs once when the component mounts
+    }, [addResponce]); // Empty dependency array ensures this effect runs once when the component mounts
 
     // Filter dishes based on search input
     const filteredDishes = dishes.filter((dish) =>
@@ -33,14 +42,13 @@ const DishesTable = () => {
 
     // Handle delete action
     const handleDelete = (id) => {
-        // Implement delete logic here (e.g., API call)
         setDishes((prevDishes) => prevDishes.filter((dish) => dish.id !== id));
     };
 
     // Handle edit action
-    const handleEdit = (id) => {
-        // Implement edit logic here
-        console.log(`Edit dish with ID: ${id}`);
+    const handleEdit = (dish) => {
+        setSelectedDish(dish); // Set the selected dish for editing
+        openModal(); // Open the modal
     };
 
     return (
@@ -148,25 +156,32 @@ const DishesTable = () => {
                                     </span>
                                 </td>
 
-                                <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                                    <button
-                                        onClick={() => handleEdit(dish.id)}
-                                        className="text-blue-500 hover:text-blue-700"
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(dish.id)}
-                                        className="text-red-500 hover:text-red-700"
-                                    >
-                                        Delete
-                                    </button>
+                                <td className="px-6 py-4 whitespace-nowrap space-x-2 flex">
+                                   <div>
+                                        <button
+                                            onClick={() => handleEdit(dish)} // Pass the selected dish here
+                                            className="text-blue-500 hover:text-blue-700"
+                                        >
+                                            Edit
+                                        </button>
+                                   </div>
+                                    <div>
+                                        <button
+                                            onClick={() => handleDelete(dish.id)}
+                                            className="text-red-500 hover:text-red-700"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </motion.tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+
+            {/* Pass selectedDish to EditDishes if it's set */}
+            {isModalOpen && selectedDish && <EditDishes dish={selectedDish} onClose={closeModal} />}
         </motion.div>
     );
 };
