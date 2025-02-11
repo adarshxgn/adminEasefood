@@ -15,7 +15,7 @@ const AddDishes = ({ onClose }) => {
         price: "",
         food_image:"",
         time_taken:"",
-        is_available: Boolean,
+        is_available: "",
     });
     useEffect(()=>{
         if(formData.food_image.type=="image/png" || formData.food_image.type=="image/jpg" || formData.food_image.type=="image/jpeg" ){
@@ -68,14 +68,19 @@ const AddDishes = ({ onClose }) => {
 
         onClose(); // Close the modal after submission
     };
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setFormData({ ...formData, food_image: file });
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setPreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
 
-
-
-    // xcvghjkl;
-    const handleCheckBox = (e)=>{
-       
-    }
     return (
         <motion.div
             className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center h-[30rem]"
@@ -155,14 +160,26 @@ const AddDishes = ({ onClose }) => {
                         <label className="block text-sm font-medium text-gray-700">
                             Food image
                         </label>
-                        <input
-                            type="file"
-                            name="food_image"
-                            onChange={e=>setFormData({...formData,food_image:e.target.files[0]})}
-                            className="w-full mt-1 p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
-                            required
-                        />
-                        <img src={preview} alt="" />
+                        <div className="text-center">
+                            {preview ? (
+                                <img src={preview} alt="Preview" className="max-h-40 mx-auto" />
+                            ) : (
+                                <p>No image chosen</p>
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => document.getElementById('image-input').click()}
+                                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Upload Image
+                            </button>
+                            <input
+                                type="file"
+                                id="image-input"
+                                className="hidden"
+                                onChange={handleImageChange}
+                            />
+                        </div>
                     </div>
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700">
@@ -177,18 +194,31 @@ const AddDishes = ({ onClose }) => {
                             required
                         />
                     </div>
-                    <div className="mt-4 flex items-center">
-                        <label className="block text-sm font-medium text-gray-700 mr-4">
-                            Available
-                        </label>
-                        <input
-                            type="checkbox"
-                            name="is_available"
-                            value={5}
-                            onChange={ e=>setFormData({...formData,is_available:e.target.value})}
-                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 text-gray-900"
-                        />
-                    </div>
+                    <div className="mt-4 flex gap-3 items-center">
+    <label className="block text-sm font-medium text-gray-700 mr-4">
+        Available
+    </label>
+    <input
+        type="radio"
+        name="is_available"
+        value="available"
+        checked={formData.is_available === "available"}
+        onChange={(e) => setFormData({ ...formData, is_available: e.target.value })}
+        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 text-gray-900"
+    />
+    <label className="block text-sm font-medium text-gray-700 mr-4">
+        Unavailable
+    </label>
+    <input
+        type="radio"
+        name="is_available"
+        value="unavailable"
+        checked={formData.is_available === "unavailable"}
+        onChange={(e) => setFormData({ ...formData, is_available: e.target.value })}
+        className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 text-gray-900"
+    />
+</div>
+        
                     <div className="mt-6 flex justify-end space-x-4">
                         <button
                             type="button"
@@ -205,9 +235,10 @@ const AddDishes = ({ onClose }) => {
                         </button>
                     </div>
                 </form>
+                </motion.div>
             </motion.div>
-        </motion.div>
     );
 };
 
 export default AddDishes;
+    

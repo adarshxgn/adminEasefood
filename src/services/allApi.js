@@ -38,15 +38,37 @@ export const getFoodListApi = async (getDish,reqHeader) => {
 export const getAllOdersAPI = async (getOder,reqHeader) =>{
   return await commonApi("GET", `${BASE_URL}/api/cart,`, getOder , reqHeader)
 }
-//API For Add Food
-export const editFoodListApi = async (editDish,reqHeader) => {
-  return await commonApi("PUT", `${BASE_URL}/api/food/`, editDish, reqHeader)
+//API For EDIT Food
+export const editFoodListApi = async (foodId,editDish,reqHeader) => {
+  return await commonApi("PUT", `${BASE_URL}/${foodId}/api/food/`, editDish, reqHeader)
+  
+}
+//API For EDIT Food
+export const deleteFoodListApi = async (foodId,reqHeader) => {
+  return await commonApi("DELETE", `${BASE_URL}/${foodId}/api/food/`, {}, reqHeader)
   
 }
 
+// api for add table
+export const addTableApi = async (addTable,reqHeader)=>{
+  return await commonApi ("POST", `${BASE_URL}/api/table/add`,addTable,reqHeader)
+}
 
+// api for edit table
+export const editTableApi = async (tableId,editTable,reqHeader)=>{
+  return await commonApi ("PUT", `${BASE_URL}/api/table/${tableId}/change`,editTable,reqHeader)
+}
+// api for delete table
 
+export const deleteTableApi = async (tableId,reqHeader)=>{
+  return await commonApi ("DELETE", `${BASE_URL}/api/table/${tableId}/delete`,{},reqHeader)
+}
 
+// geta all table 
+
+export const getTableApi = async (getTable,reqHeader)=>{
+  return await commonApi ("GET", `${BASE_URL}/api/table/add`,getTable,reqHeader)
+}
 
 export const refreshAccessToken = async (refreshToken) => {
     const payload = { refresh_token: refreshToken };

@@ -2,7 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import AddDishes from "./AddDishes";
-import { getFoodListApi } from "../../services/allApi";
+import { deleteFoodListApi, getFoodListApi } from "../../services/allApi";
 import { BASE_URL } from "../../services/baseUrl";
 import { addResponceContext } from "../../pages/context/ContextShare";
 import EditDishes from "./EditDishes";
@@ -39,17 +39,32 @@ const DishesTable = () => {
     const filteredDishes = dishes.filter((dish) =>
         dish.food_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+    
     // Handle delete action
-    const handleDelete = (id) => {
-        setDishes((prevDishes) => prevDishes.filter((dish) => dish.id !== id));
+    const handleDelete =async (foodId) => {
+        const token = localStorage.getItem("accessToken")   
+                    if(token){
+                        const reqHeader = {
+                          "Content-Type":"application/json",
+                          "Authorization":`Bearer ${token}`
+                        }
+                        try{
+                            const result = await deleteFoodListApi(foodId,reqHeader)
+                            console.log(result);
+                            if(result.status==200){
+                                fetchFoodList()
+                            }else{
+                                console.log(result);
+                                
+                            }
+                            
+                        }catch(err){
+                            console.log(err);
+                            
+                        }   
+                    }
     };
 
-    // Handle edit action
-    const handleEdit = (dish) => {
-        setSelectedDish(dish); // Set the selected dish for editing
-        openModal(); // Open the modal
-    };
 
     return (
         <motion.div
@@ -115,6 +130,7 @@ const DishesTable = () => {
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.3 }}
                             >
+                                
                                 <td className="px-6 py-4 whitespace-nowrap">
                                     <div className="flex items-center">
                                         <div className="flex-shrink-0 h-12 w-12">
@@ -145,14 +161,16 @@ const DishesTable = () => {
                                 </td>
 
                                 <td className="px-6 py-4 whitespace-nowrap">
+                                    
                                     <span
                                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            dish.is_available
+                                            dish.is_available==="available"
                                                 ? "bg-green-800 text-green-100"
                                                 : "bg-red-800 text-red-100"
-                                        }`}
+                                        }`
+                                    }
                                     >
-                                        {dish.is_available ? "Available" : "Unavailable"}
+                                        {dish.is_available==="available"  ? "Available" : "Unavailable"}
                                     </span>
                                 </td>
 

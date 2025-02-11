@@ -7,6 +7,7 @@ import Sidebar from "./components/common/Sidebar";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import DishesPage from "./pages/dishespage/DishesPage";
 import OdersPage from "./pages/oderpage/OdersPage";
+import Tablepages from "./pages/tablepage/Tablepages";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/dishes" element={<DishesPage/>} />
                     <Route path="/orders" element={<OdersPage/>} />
+                    <Route path="/tables" element={<Tablepages/>}/>
                   </Routes>
               </div>
             </ProtectedRoutes>
