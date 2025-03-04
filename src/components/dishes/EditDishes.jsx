@@ -1,13 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { useDropzone } from "react-dropzone";
 import { motion } from "framer-motion";
-import { addFoodListApi, editFoodListApi } from "../../services/allApi";
+import { editFoodListApi } from "../../services/allApi";
 import { editResponceContext } from "../../pages/context/ContextShare";
-import { useContext } from "react"; 
 import { BASE_URL } from "../../services/baseUrl";
 
 const EditDishes = ({ onClose, dish }) => {
-    const [imageFileStatus, setImageFileStatus] = useState(false);
-    const [preview, setPreview] = useState('');
+    const [preview, setPreview] = useState("");
     const { editResponce, setEditResponce } = useContext(editResponceContext);
     const [formData, setFormData] = useState({
         foodId: dish?.id,
@@ -19,89 +18,86 @@ const EditDishes = ({ onClose, dish }) => {
         time_taken: dish?.time_taken,
         is_available: dish?.is_available
     });
-    console.log('preview', preview);
 
     useEffect(() => {
         if (dish && dish.food_image) {
-            if (typeof dish.food_image === 'string') {
-                setPreview(`${BASE_URL}${dish.food_image}`);
-                setFormData(prevState => ({
-                    ...prevState,
-                    food_image: dish.food_image
-                }));
-                setImageFileStatus(true);
-            } else if (dish.food_image instanceof File) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setPreview(reader.result);
-                };
-                reader.readAsDataURL(dish.food_image);
-                setImageFileStatus(true);
-            } else {
-                setImageFileStatus(false);
-                setPreview('');
+            if (typeof dish.food_image === "string") {
+                const imageUrl = `${BASE_URL}${dish.food_image}`;
+                setPreview(imageUrl);
+                fetch(imageUrl)
+                    .then((res) => res.blob())
+                    .then((blob) => {
+                        const file = new File([blob], "image.jpg", { type: blob.type });
+                        setFormData((prev) => ({ ...prev, food_image: file }));
+                    });
             }
         }
     }, [dish]);
 
-    const owner = localStorage.getItem("owner");
+    // 🔹 Drag & Drop Handling
+    const { getRootProps, getInputProps } = useDropzone({
+        accept: "image/*",
+        multiple: false,
+        onDrop: (acceptedFiles) => {
+            const file = acceptedFiles[0];
+            if (file) {
+                setFormData({ ...formData, food_image: file });
 
-    const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData({ ...formData, food_image: file });
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setPreview(reader.result);
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+                const reader = new FileReader();
+                reader.onloadend = () => setPreview(reader.result);
+                reader.readAsDataURL(file);
+            }
+        },
+    });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         const { foodId, food_name, description, food_category_obj, price, food_image, time_taken, is_available } = formData;
+
         if (food_name && description && food_category_obj && price && food_image && time_taken && is_available) {
             const editDish = new FormData();
-            editDish.append('foodId', foodId);
-            editDish.append('food_name', food_name);
-            editDish.append('description', description);
-            editDish.append('food_category_obj', food_category_obj);
-            editDish.append('price', price);
-            editDish.append('food_image', food_image);  // Always append the image file here
-            editDish.append('time_taken', time_taken);
-            editDish.append('is_available', is_available);
-            editDish.append('owner', owner);
+            editDish.append("food_name", food_name);
+            editDish.append("description", description);
+            editDish.append("food_category_obj", food_category_obj);
+            editDish.append("price", price);
 
-            const token = localStorage.getItem("accessToken");
-            if (token) {
-                const reqHeader = {
-                    "Content-Type": "multipart/form-data",
-                    "Authorization": `Bearer ${token}`
-                };
-                try {
-                    const result = await editFoodListApi(foodId, editDish, reqHeader);
-                    console.log(result);
-                    if (result.status === 200) {
-                        onClose();
-                        setEditResponce(result);
-                    } else {
-                        alert(result.response.data);
-                    }
-                } catch (err) {
-                    console.log(err.response);
+            // Append file only if a new image is selected
+            if (food_image instanceof File) {
+                editDish.append("food_image", food_image);
+            }
+
+            editDish.append("time_taken", time_taken);
+            editDish.append("is_available", is_available);
+            editDish.append("owner", localStorage.getItem("owner"));
+
+            try {
+                const token = localStorage.getItem("accessToken");
+                const result = await editFoodListApi(foodId, editDish, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+
+                if (result.status === 200) {
+                    onClose();
+                    setEditResponce(result);
+                } else {
+                    alert(result.response.data);
                 }
+            } catch (err) {
+                console.log(err.response);
             }
         }
-        onClose(); // Close the modal after submission
     };
-
+    
     return (
         <motion.div
             className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center h-[30rem]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            style={{ marginTop: '5rem' }}
         >
             <motion.div
                 className="bg-white rounded-lg shadow-lg p-6 w-96"
@@ -118,7 +114,7 @@ const EditDishes = ({ onClose, dish }) => {
                         ✕
                     </button>
                 </div>
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} encType="multipart/form-data">
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700">
                             Dish Name
@@ -172,28 +168,17 @@ const EditDishes = ({ onClose, dish }) => {
                         />
                     </div>
                     <div className="mt-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Food image
-                        </label>
-                        <div className="text-center">
+                        <label className="block text-sm font-medium text-gray-700">Food Image</label>
+                        <div
+                            {...getRootProps()}
+                            className="mt-2 p-4 border-2 border-dashed border-gray-300 rounded-md text-center cursor-pointer bg-gray-50 hover:bg-gray-100"
+                        >
+                            <input {...getInputProps()} />
                             {preview ? (
                                 <img src={preview} alt="Preview" className="max-h-40 mx-auto" />
                             ) : (
-                                <p>No image chosen</p>
+                                <p className="text-gray-500">Drag & drop an image here, or click to select one</p>
                             )}
-                            <button
-                                type="button"
-                                onClick={() => document.getElementById('image-input').click()}
-                                className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                            >
-                                Upload Image
-                            </button>
-                            <input
-                                type="file"
-                                id="image-input"
-                                className="hidden"
-                                onChange={handleImageChange}
-                            />
                         </div>
                     </div>
                     <div className="mt-4">

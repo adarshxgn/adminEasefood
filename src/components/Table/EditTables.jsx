@@ -1,22 +1,23 @@
-import { motion } from 'motion/react'
-import React, { useContext, useState } from 'react'
-import { addTableApi } from '../../services/allApi'
-import { tableaddResponceContext } from '../../pages/context/ContextShare'
+import React from 'react'
+import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { editTableApi } from '../../services/allApi'
+import { tableEditResponceContext } from '../../pages/context/ContextShare'
 
-const Addtables = ({onClose}) => {
-    const {tableaddResponce, setTableAddResponce} = useContext(tableaddResponceContext)
+const EditTables = ({table,onClose}) => {
+    const {tableEditResponce, setTableEditResponce} = useState(tableEditResponceContext)
     const [formdata, setFormdata] = useState({
-        table_number: "",
-        owner: ""
+        table_number: table.table_number,
+        owner: table.owner
     })
-const owner = localStorage.getItem("owner")
+    const owner = localStorage.getItem("owner")
     const handleSubmit = async(e)=>{
         e.preventDefault()
         const{table_number} =formdata
         if(table_number){
-            const addTable = new FormData()
-            addTable.append('table_number',table_number)
-            addTable.append('owner',owner)
+            const editTable = new FormData()
+            editTable.append('table_number',table_number)
+            editTable.append('owner',owner)
 
             const token = localStorage.getItem("accessToken")   
                         if(token){
@@ -25,11 +26,11 @@ const owner = localStorage.getItem("owner")
                               "Authorization":`Bearer ${token}`
                             }
                             try{
-                                const result = await addTableApi(addTable,reqHeader)
+                                const result = await editTableApi(table.id,editTable,reqHeader)
                                 console.log(result);
-                                if(result.status==201){
+                                if(result.status==200){
                                     onClose()
-                                    setTableAddResponce(result.data)
+                                    setTableEditResponce(result.data)
                                 }else{
                                     console.log(result.response.data)
                                 }
@@ -84,7 +85,7 @@ const owner = localStorage.getItem("owner")
                             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                             onClick={handleSubmit}
                         >
-                            Add Table   
+                            Edit Table   
                         </button>
                     </div>
         </form>
@@ -92,4 +93,4 @@ const owner = localStorage.getItem("owner")
   )
 }
 
-export default Addtables
+export default EditTables

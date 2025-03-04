@@ -4,11 +4,12 @@ import { Search } from "lucide-react";
 import AddDishes from "./AddDishes";
 import { deleteFoodListApi, getFoodListApi } from "../../services/allApi";
 import { BASE_URL } from "../../services/baseUrl";
-import { addResponceContext } from "../../pages/context/ContextShare";
+import { addResponceContext,editResponceContext } from "../../pages/context/ContextShare";
 import EditDishes from "./EditDishes";
 
 const DishesTable = () => {
     const { addResponce, setAddResponce } = useContext(addResponceContext);
+    const { editResponce, setEditResponce } = useContext(editResponceContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [dishes, setDishes] = useState([]); // State to hold the list of dishes
     const [searchTerm, setSearchTerm] = useState(""); // State for search input
@@ -33,7 +34,7 @@ const DishesTable = () => {
         };
 
         fetchFoodList();
-    }, [addResponce]); // Empty dependency array ensures this effect runs once when the component mounts
+    }, [addResponce,editResponce]); // Empty dependency array ensures this effect runs once when the component mounts
 
     // Filter dishes based on search input
     const filteredDishes = dishes.filter((dish) =>
@@ -41,31 +42,31 @@ const DishesTable = () => {
     );
     
     // Handle delete action
-    const handleDelete =async (foodId) => {
-        const token = localStorage.getItem("accessToken")   
-                    if(token){
-                        const reqHeader = {
-                          "Content-Type":"application/json",
-                          "Authorization":`Bearer ${token}`
-                        }
-                        try{
-                            const result = await deleteFoodListApi(foodId,reqHeader)
-                            console.log(result);
-                            if(result.status==200){
-                                fetchFoodList()
-                            }else{
-                                console.log(result);
-                                
-                            }
-                            
-                        }catch(err){
-                            console.log(err);
-                            
-                        }   
-                    }
+    const handleDelete = async (foodId) => {
+        const token = localStorage.getItem("accessToken");
+        if (token) {
+            const reqHeader = {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            };
+            try {
+                const result = await deleteFoodListApi(foodId, reqHeader);
+                console.log(result);
+                if (result.status == 200) {
+                    fetchFoodList();
+                } else {
+                    console.log(result);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
     };
 
-
+    const handleEdit = (dish) => {
+        setSelectedDish(dish); // Set the selected dish for editing
+        openModal(); // Open the modal
+    }
     return (
         <motion.div
             className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700"
@@ -75,7 +76,7 @@ const DishesTable = () => {
         >
             <div className="flex justify-start items-center mb-6">
                 <h2 className="text-xl font-semibold text-gray-100">Dishes</h2>
-                <div>
+                <div className="z-10">  
                     <button
                         className="text-lg rounded-lg bg-blue-700 hover:bg-blue-800 text-blue-100 m-5 p-1"
                         onClick={openModal}
@@ -83,7 +84,11 @@ const DishesTable = () => {
                         Add Dish
                     </button>
 
-                    {isModalOpen && <AddDishes onClose={closeModal} />}
+                    {isModalOpen && !selectedDish && (
+                        <div className="fixed inset-0 flex items-center justify-center z-50">
+                            <AddDishes onClose={closeModal} />
+                        </div>
+                    )}
                 </div>
                 <div className="relative ml-auto">
                     <input
@@ -199,7 +204,11 @@ const DishesTable = () => {
             </div>
 
             {/* Pass selectedDish to EditDishes if it's set */}
-            {isModalOpen && selectedDish && <EditDishes dish={selectedDish} onClose={closeModal} />}
+            {isModalOpen && selectedDish && (
+                <div className="fixed inset-0 flex items-center justify-center z-50">
+                    <EditDishes dish={selectedDish} onClose={closeModal} />
+                </div>
+            )}
         </motion.div>
     );
 };

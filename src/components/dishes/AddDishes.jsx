@@ -55,6 +55,8 @@ const AddDishes = ({ onClose }) => {
                     if(result.status==200){
                         onclose()
                         setAddResponce(result)
+                        console.log(result.data);
+                        
                     }else{
                         console.log(result.response.data)
                     }
@@ -103,7 +105,7 @@ const AddDishes = ({ onClose }) => {
                         ✕  
                     </button>
                 </div>
-                <form onSubmit={handleSubmit}>
+                <form className="mt-9" onSubmit={handleSubmit}>
                     <div className="mt-4">
                         <label className="block text-sm font-medium text-gray-700">
                             Dish Name
