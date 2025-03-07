@@ -30,46 +30,52 @@ const AddDishes = ({ onClose }) => {
 
  const owner = localStorage.getItem("owner")
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const{food_name,description,food_category_obj,price,food_image,time_taken,is_available}=formData
-        if(food_name && description && food_category_obj && price && food_image && time_taken && is_available&&owner){
-            const addDish = new FormData()
-            addDish.append('food_name',food_name)
-            addDish.append('description',description)
-            addDish.append('food_category_obj',food_category_obj)
-            addDish.append('price',price)
-            addDish.append('food_image',food_image)
-            addDish.append('time_taken',time_taken)
-            addDish.append('is_available',is_available)
-            addDish.append('owner',owner)
+    e.preventDefault();
+    
+    const { food_name, description, food_category_obj, price, food_image, time_taken, is_available } = formData;
+    const owner = localStorage.getItem("owner");
 
-            const token = localStorage.getItem("accessToken")   
-            if(token){
-                const reqHeader = {
-                  "Content-Type":"multipart/form-data",
-                  "Authorization":`Bearer ${token}`
+    if (food_name && description && food_category_obj && price && food_image && time_taken && is_available && owner) {
+        const addDish = new FormData();
+        addDish.append("food_name", food_name);
+        addDish.append("description", description);
+        addDish.append("food_category_obj", food_category_obj);
+        addDish.append("price", price);
+        addDish.append("food_image", food_image);
+        addDish.append("time_taken", time_taken);
+        addDish.append("is_available", is_available);
+        addDish.append("owner", owner);
+
+        const token = localStorage.getItem("accessToken");
+
+        if (token) {
+            const reqHeader = {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`,
+            };
+
+            try {
+                const result = await addFoodListApi(addDish, reqHeader);
+                console.log("API Response:", result);
+
+                if (result.status === 201) {
+                    console.log("Dish added successfully:", result.data);
+                    setAddResponce(result);
+                    onClose(); 
+                } else {
+                    console.error("Unexpected Response:", result);
                 }
-                try{
-                    const result = await addFoodListApi(addDish,reqHeader)
-                    console.log(result);
-                    if(result.status==200){
-                        onclose()
-                        setAddResponce(result)
-                        console.log(result.data);
-                        
-                    }else{
-                        console.log(result.response.data)
-                    }
-                    
-                }catch(err){
-                    console.log(err.response);
-                    
-                }
+            } catch (err) {
+                console.error("API Error:", err.response ? err.response.data : err.message);
             }
+        } else {
+            console.error("No token found. Please log in.");
         }
+    } else {
+        console.error("Missing required fields.");
+    }
+};
 
-        onClose(); // Close the modal after submission
-    };
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -85,7 +91,7 @@ const AddDishes = ({ onClose }) => {
 
     return (
         <motion.div
-            className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center h-[30rem]"
+            className="fixed inset-0 flex items-center justify-center h-[30rem]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

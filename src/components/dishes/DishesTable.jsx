@@ -11,7 +11,7 @@ const DishesTable = () => {
     const { addResponce, setAddResponce } = useContext(addResponceContext);
     const { editResponce, setEditResponce } = useContext(editResponceContext);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [dishes, setDishes] = useState([]);
+    const [dishes, setDishes] = useState([]); 
     const [searchTerm, setSearchTerm] = useState(""); 
     const [selectedDish, setSelectedDish] = useState(null); 
     
@@ -20,18 +20,17 @@ const DishesTable = () => {
         setIsModalOpen(false);
         setSelectedDish(null); 
     };
+    const fetchFoodList = async () => {
+        try {
+            const response = await getFoodListApi();
+            setDishes(response.data);
+            console.log(response.data);
+        } catch (error) {
+            console.error("Error fetching food list:", error);
+        }
+    };
 
     useEffect(() => {
-        const fetchFoodList = async () => {
-            try {
-                const response = await getFoodListApi();
-                setDishes(response.data);
-                console.log(response.data);
-            } catch (error) {
-                console.error("Error fetching food list:", error);
-            }
-        };
-
         fetchFoodList();
     }, [addResponce,editResponce]); 
 
@@ -50,7 +49,7 @@ const DishesTable = () => {
             try {
                 const result = await deleteFoodListApi(foodId, reqHeader);
                 console.log(result);
-                if (result.status == 200) {
+                if (result.status == 204) {
                     fetchFoodList();
                 } else {
                     console.log(result);

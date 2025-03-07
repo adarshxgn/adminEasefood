@@ -28,7 +28,7 @@ const OdersPage = () => {
     // })
   return (
    <div className='flex-1 relative z-10 overflow-auto'>
-   <Header title={"Oders"} />
+   <Header title={"Orders"} />
         <motion.div
         className="bg-grey-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 w-full mt-9"
                 initial={{ opacity: 0, y: 20 }}

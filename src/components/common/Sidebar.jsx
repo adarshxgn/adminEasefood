@@ -1,4 +1,4 @@
-import { BarChart2, LogOut, Menu, ChartBarStacked, ShoppingBag, ShoppingCart, TrendingUp, Users } from "lucide-react";
+import { BarChart2, LogOut, Menu, ChartBarStacked, ShoppingBag, ShoppingCart, TrendingUp, Users,AlignEndHorizontal, Dice4 } from "lucide-react";
 import { useState } from "react";
 import { AnimatePresence , motion} from "motion/react"
 import { Link } from "react-router-dom";
@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 const SIDEBAR_ITEMS = [
 	{ name: "Dashboard", icon:BarChart2, color: "#10B981", href: "/dashboard" },
 	{ name: "Orders", icon: ShoppingCart, color: "#F59E0B", href: "/orders" },
-	{ name: "Tables", icon: ChartBarStacked, color: "#8B5CF6", href: "/tables" },
-	{ name: "Dishes", icon: ShoppingBag, color: "#8B5CF6", href: "/dishes" },
-	{ name: "Logout", icon: LogOut, color: "#8B5CF6", href: "/logout" },
+	{ name: "Tables", icon: Dice4, color: "#28b463", href: "/tables" },
+	{ name: "Dishes", icon: ShoppingBag, color: "#2980b9", href: "/dishes" },
+	{ name: "Category", icon: AlignEndHorizontal, color: "#8B5CF6", href: "/category" },
 	// { name: "Users", icon: Users, color: "#EC4899", href: "/users" },
 	// { name: "Analytics", icon: TrendingUp, color: "#3B82F6", href: "/analytics" },
 	// {name: "Overview",icon: DollarSign,color: "#6366f1",href: "/overview",},

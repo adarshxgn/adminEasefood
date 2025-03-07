@@ -19,30 +19,31 @@ const EditDishes = ({ onClose, dish }) => {
         time_taken: dish?.time_taken,
         is_available: dish?.is_available
     });
-    console.log('preview', preview);
 
     useEffect(() => {
-        if (dish && dish.food_image) {
-            if (typeof dish.food_image === 'string') {
+        const fetchImage = async () => {
+            if (dish?.food_image && typeof dish.food_image === 'string') {
                 setPreview(`${BASE_URL}${dish.food_image}`);
-                setFormData(prevState => ({
-                    ...prevState,
-                    food_image: dish.food_image
-                }));
-                setImageFileStatus(true);
-            } else if (dish.food_image instanceof File) {
-                const reader = new FileReader();
-                reader.onloadend = () => {
-                    setPreview(reader.result);
-                };
-                reader.readAsDataURL(dish.food_image);
-                setImageFileStatus(true);
-            } else {
-                setImageFileStatus(false);
-                setPreview('');
+                try {
+                    const response = await fetch(`${BASE_URL}${dish.food_image}`);
+                    const blob = await response.blob();
+                    const file = new File([blob], "image.jpg", { type: blob.type });
+                    
+                    setFormData(prevState => ({
+                        ...prevState,
+                        food_image: file
+                    }));
+    
+                    setImageFileStatus(true);
+                } catch (error) {
+                    console.error("Error fetching image:", error);
+                }
             }
-        }
+        };
+    
+        fetchImage();
     }, [dish]);
+    
 
     const owner = localStorage.getItem("owner");
 
@@ -98,7 +99,7 @@ const EditDishes = ({ onClose, dish }) => {
 
     return (
         <motion.div
-            className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center h-[30rem]"
+            className="fixed inset-0  flex items-center justify-center h-[40rem]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

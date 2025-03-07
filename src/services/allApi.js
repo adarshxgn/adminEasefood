@@ -42,7 +42,7 @@ export const getAllOdersAPI = async (getOder,reqHeader) =>{
 export const editFoodListApi = async (foodId, editDish, reqHeader) => {
   return await commonApi("PUT", `${BASE_URL}/api/food/${foodId}/`, editDish, reqHeader);
 };
-//API For EDIT Food
+//API For delete Food
 export const deleteFoodListApi = async (foodId, reqHeader) => {
   return await commonApi("DELETE", `${BASE_URL}/api/food/${foodId}/`, null, reqHeader);
 };
@@ -66,6 +66,12 @@ export const deleteTableApi = async (tableId,reqHeader)=>{
 
 export const getTableApi = async (getTable,reqHeader)=>{
   return await commonApi ("GET", `${BASE_URL}/api/table/add`,getTable,reqHeader)
+}
+
+// get category 
+
+export const getCategoryApi = async (getCategory,reqHeader)=>{
+  return await commonApi ("GET", `${BASE_URL}/api/foodcat`,getCategory,reqHeader)
 }
 
 

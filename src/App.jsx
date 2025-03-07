@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import DishesPage from "./pages/dishespage/DishesPage";
 import OdersPage from "./pages/oderpage/OdersPage";
 import Tablepages from "./pages/tablepage/Tablepages";
+import CategoryPage from "./pages/Category/CategoryPage";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
                     <Route path="/dishes" element={<DishesPage/>} />
                     <Route path="/orders" element={<OdersPage/>} />
                     <Route path="/tables" element={<Tablepages/>}/>
+                    <Route path="/category" element={<CategoryPage/>}/>
                   </Routes>
               </div>
             </ProtectedRoutes>
